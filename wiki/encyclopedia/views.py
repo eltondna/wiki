@@ -68,7 +68,7 @@ def newpage(request):
 
 
 
-
+# Random Page set up 
 def random(request):
     entry_ls = util.list_entries()
     length = len(entry_ls)
@@ -76,6 +76,29 @@ def random(request):
     number = randint(0,length-1)
     random_entry = entry_ls[number]
     return HttpResponseRedirect(random_entry)
+
+
+def edit(request):
+    if request.method=="GET":
+        topic = request.GET.get("topic")
+        content = util.get_entry(topic)
+
+        return render(request,"encyclopedia/edit.html",{
+            "topic": topic,
+            "content": content,
+        })
+
+    else:
+        topic = request.POST.get("topic")
+        edited_content = request.POST.get("edited_content")
+        util.save_entry(topic, edited_content)
+        return HttpResponseRedirect(topic)
+        
+        
+    
+
+
+
 
 
 
