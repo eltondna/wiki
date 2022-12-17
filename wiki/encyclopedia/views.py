@@ -1,12 +1,11 @@
 from django.shortcuts import render 
 from . import util
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect,HttpResponseForbidden
 from django.urls import reverse
+from random import randint
 
 
-
-
-# Main Page # 
+    # Main Page # 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -49,9 +48,26 @@ def search(request):
 
 
 
-def newPage(request):
+#Create New Page 
+
+def newpage(request):
+    if request.method == "POST":
+        topic = request.POST.get("new_topic")
+        content = request.POST.get("new_content")
+    # Check whether thios topic exists already
+        if util.get_entry(topic) !=None:
+            error = "This topic already exists"
+            return render(request,"encyclopedia/newpage.html",{
+                "error": error,
+            })
+        else:
+            util.save_entry(topic,content)
+    # Redirect user back to the Home Page
+            return HttpResponseRedirect(reverse('index'))
+    return render(request,"encyclopedia/newpage.html")
+
+
+
+
+def random(request):
     pass
-
-
-
-
