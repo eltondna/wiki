@@ -3,9 +3,16 @@ from . import util
 from django.http import HttpResponseNotFound, HttpResponseRedirect,HttpResponseForbidden
 from django.urls import reverse
 from random import randint
+from markdown2 import Markdown
 
 
-    # Main Page # 
+
+# Markdown content ( easier version )
+markdowner = Markdown()
+
+
+
+# Main Page # 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -15,11 +22,12 @@ def index(request):
 def pages(request, page):
     # chenck whether page route exist #
     page_content  = util.get_entry(page)
+    marked_page_content = markdowner.convert(page_content)
     # Return page content if it exists #
     if ( page_content != None):
         return render(request, "encyclopedia/pages.html",{
-            "page" : page.capitalize(),
-            "content":page_content
+            "page": page.upper(),
+            "content":marked_page_content
         })
     else:
         return HttpResponseNotFound(f"Page {page} Not found ")
@@ -72,17 +80,15 @@ def newpage(request):
 def random(request):
     entry_ls = util.list_entries()
     length = len(entry_ls)
-
     number = randint(0,length-1)
     random_entry = entry_ls[number]
-    return HttpResponseRedirect(random_entry)
+    return HttpResponseRedirect(f"/wiki/{random_entry}")
 
 
 def edit(request):
     if request.method=="GET":
         topic = request.GET.get("topic")
         content = util.get_entry(topic)
-
         return render(request,"encyclopedia/edit.html",{
             "topic": topic,
             "content": content,
@@ -92,17 +98,7 @@ def edit(request):
         topic = request.POST.get("topic")
         edited_content = request.POST.get("edited_content")
         util.save_entry(topic, edited_content)
-        return HttpResponseRedirect(topic)
-        
-        
-    
-
-
-
-
-
-
-
+        return HttpResponseRedirect(f"/wiki/{topic}")       
 
 
 
