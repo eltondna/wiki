@@ -70,4 +70,18 @@ def newpage(request):
 
 
 def random(request):
-    pass
+    entry_ls = util.list_entries()
+    length = len(entry_ls)
+
+    number = randint(0,length-1)
+    random_entry = entry_ls[number]
+    return HttpResponseRedirect(random_entry)
+
+
+
+
+
+
+
+
+
